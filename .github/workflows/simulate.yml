@@ -1,0 +1,79 @@
+name: Run Synthetic Census
+
+on:
+  workflow_dispatch:
+    inputs:
+      use_case_id:
+        description: 'Use case ID (folder name under personas/)'
+        required: true
+        type: string
+      question:
+        description: 'Question to ask the demographic panel'
+        required: true
+        type: string
+      samples_per_persona:
+        description: 'Number of independent samples per persona'
+        required: false
+        default: '3'
+        type: string
+      temperature:
+        description: 'Sampling temperature (0.0-1.0)'
+        required: false
+        default: '0.7'
+        type: string
+
+jobs:
+  simulate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Validate personas directory
+        run: |
+          if [ ! -d "personas/${{ inputs.use_case_id }}" ]; then
+            echo "::error::Personas directory not found: personas/${{ inputs.use_case_id }}"
+            echo "Please create the directory and add persona .md files first."
+            exit 1
+          fi
+
+          PERSONA_COUNT=$(find personas/${{ inputs.use_case_id }} -name "*.md" ! -name ".gitkeep" | wc -l)
+          echo "Found $PERSONA_COUNT persona(s) in personas/${{ inputs.use_case_id }}"
+
+          if [ "$PERSONA_COUNT" -eq 0 ]; then
+            echo "::error::No .md files found in personas/${{ inputs.use_case_id }}"
+            exit 1
+          fi
+
+          # Calculate expected API calls
+          SAMPLES=${{ inputs.samples_per_persona }}
+          TOTAL_CALLS=$((PERSONA_COUNT * SAMPLES + 1))
+          echo "Expected API calls: $TOTAL_CALLS (${PERSONA_COUNT} personas × ${SAMPLES} samples + 1 aggregation)"
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install anthropic
+
+      - name: Run simulation
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          python scripts/run_simulation.py \
+            "${{ inputs.use_case_id }}" \
+            "${{ inputs.question }}" \
+            ${{ inputs.samples_per_persona }} \
+            ${{ inputs.temperature }}
+
+      - name: Commit results
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add outputs/
+          git diff --staged --quiet || git commit -m "Census [${{ inputs.use_case_id }}]: ${{ inputs.question }}"
+          git push
