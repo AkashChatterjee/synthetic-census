@@ -1,0 +1,17 @@
+{
+  "use_case_id": "ai_job_impact",
+  "run_id": "run_20251229_170938",
+  "question": "How would you job look like in the next 5 years with AI?",
+  "samples_per_persona": 1,
+  "temperature": 0.4,
+  "personas": [
+    "high_school_teacher",
+    "radiologist",
+    "retail_manager",
+    "software_engineer",
+    "truck_driver"
+  ],
+  "total_api_calls": 6,
+  "timestamp": "2025-12-29T17:09:38.510726",
+  "model": "claude-sonnet-4-5-20250929"
+}
