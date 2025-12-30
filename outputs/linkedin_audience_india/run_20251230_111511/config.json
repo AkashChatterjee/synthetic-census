@@ -1,0 +1,20 @@
+{
+  "cohort_id": "linkedin_audience_india",
+  "run_id": "run_20251230_111511",
+  "question": "What are some unique interesting topics regarding product management you'd like to engage with on LinkedIn but you see few people write posts about it? Give me your top three ideas for linkedin posts with some non-trivial points about what you expect to learn from those.",
+  "samples_per_persona": 3,
+  "temperature": 0.7,
+  "personas": [
+    "corporate_executive",
+    "freelancer_consultant",
+    "hr_professional",
+    "marketing_professional",
+    "mba_graduate",
+    "product_manager",
+    "startup_founder",
+    "tech_professional"
+  ],
+  "total_api_calls": 25,
+  "timestamp": "2025-12-30T11:15:11.153994",
+  "model": "claude-sonnet-4-5-20250929"
+}
