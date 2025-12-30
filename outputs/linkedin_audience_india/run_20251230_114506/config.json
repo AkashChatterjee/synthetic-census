@@ -1,0 +1,20 @@
+{
+  "cohort_id": "linkedin_audience_india",
+  "run_id": "run_20251230_114506",
+  "question": "specific to product UX and UI suggestions in existing products, write a LinkedIn post that you feel if someone else had written, you'd have really liked and engaged with it. Not more than 200 words.",
+  "samples_per_persona": 1,
+  "temperature": 0.7,
+  "personas": [
+    "corporate_executive",
+    "freelancer_consultant",
+    "hr_professional",
+    "marketing_professional",
+    "mba_graduate",
+    "product_manager",
+    "startup_founder",
+    "tech_professional"
+  ],
+  "total_api_calls": 9,
+  "timestamp": "2025-12-30T11:45:06.834718",
+  "model": "claude-sonnet-4-5-20250929"
+}
