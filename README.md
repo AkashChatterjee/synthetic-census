@@ -50,19 +50,19 @@ Go to: **Repository → Settings → Secrets and variables → Actions → New r
 2. Select **Run Synthetic Census**
 3. Click **Run workflow**
 4. Fill in the parameters:
-   - `use_case_id`: `ai_job_impact` (or your own)
+   - `cohort_id`: `tier_1_city` (or your own)
    - `question`: Your question
    - `samples_per_persona`: 3 (default)
    - `temperature`: 0.7 (default)
 5. Wait for completion
-6. Find results in `outputs/{use_case_id}/{run_id}/`
+6. Find results in `outputs/{cohort_id}/{run_id}/`
 
-## Creating a New Use Case
+## Creating a New Cohort
 
-1. Create folder: `personas/your_use_case_id/`
-2. Add persona `.md` files (see examples in `personas/ai_job_impact/`)
+1. Create folder: `personas/your_cohort_id/`
+2. Add persona `.md` files (see examples in `personas/tier_1_city/`)
 3. Commit and push
-4. Run simulation with your new `use_case_id`
+4. Run simulation with your new `cohort_id`
 
 ## Persona File Format
 
@@ -86,7 +86,7 @@ When answering questions, respond authentically as this person would—with thei
 
 ```
 outputs/
-├── {use_case_id}/
+├── {cohort_id}/
 │   ├── run_20241229_143022/
 │   │   ├── config.json       # Run configuration
 │   │   ├── responses.json    # All raw responses
@@ -100,7 +100,7 @@ outputs/
 
 | Input | Default | Description |
 |-------|---------|-------------|
-| `use_case_id` | (required) | Folder name under `personas/` |
+| `cohort_id` | (required) | Folder name under `personas/` |
 | `question` | (required) | Question to ask all personas |
 | `samples_per_persona` | 3 | Independent API calls per persona |
 | `temperature` | 0.7 | Sampling randomness (0.0-1.0) |
@@ -133,7 +133,7 @@ Each run makes this many API calls:
 
 ## Tips
 
-- **5-8 personas** per use case gives good coverage without excessive API costs
+- **5-8 personas** per cohort gives good coverage without excessive API costs
 - **3 samples** is usually sufficient; use 5 for higher-stakes analysis
 - Make personas **authentic, not caricatures**—include nuance and internal conflict
 - Vary **demographics that actually matter** for your specific question
