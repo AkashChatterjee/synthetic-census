@@ -1,0 +1,18 @@
+{
+  "cohort_id": "tier_1_city",
+  "run_id": "run_20251230_051329",
+  "question": "What is your thought on 10-min quick commerce rise in India?",
+  "samples_per_persona": 3,
+  "temperature": 0.7,
+  "personas": [
+    "corporate_professional",
+    "delivery_worker",
+    "retail_shop_owner",
+    "software_engineer",
+    "startup_founder",
+    "traditional_business_owner"
+  ],
+  "total_api_calls": 19,
+  "timestamp": "2025-12-30T05:13:29.203126",
+  "model": "claude-sonnet-4-5-20250929"
+}
