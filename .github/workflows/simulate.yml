@@ -3,8 +3,8 @@ name: Run Synthetic Census
 on:
   workflow_dispatch:
     inputs:
-      use_case_id:
-        description: 'Use case ID (folder name under personas/)'
+      cohort_id:
+        description: 'Cohort ID (folder name under personas/)'
         required: true
         type: string
       question:
@@ -35,17 +35,17 @@ jobs:
 
       - name: Validate personas directory
         run: |
-          if [ ! -d "personas/${{ inputs.use_case_id }}" ]; then
-            echo "::error::Personas directory not found: personas/${{ inputs.use_case_id }}"
+          if [ ! -d "personas/${{ inputs.cohort_id }}" ]; then
+            echo "::error::Personas directory not found: personas/${{ inputs.cohort_id }}"
             echo "Please create the directory and add persona .md files first."
             exit 1
           fi
 
-          PERSONA_COUNT=$(find personas/${{ inputs.use_case_id }} -name "*.md" ! -name ".gitkeep" | wc -l)
-          echo "Found $PERSONA_COUNT persona(s) in personas/${{ inputs.use_case_id }}"
+          PERSONA_COUNT=$(find personas/${{ inputs.cohort_id }} -name "*.md" ! -name ".gitkeep" | wc -l)
+          echo "Found $PERSONA_COUNT persona(s) in personas/${{ inputs.cohort_id }}"
 
           if [ "$PERSONA_COUNT" -eq 0 ]; then
-            echo "::error::No .md files found in personas/${{ inputs.use_case_id }}"
+            echo "::error::No .md files found in personas/${{ inputs.cohort_id }}"
             exit 1
           fi
 
@@ -67,7 +67,7 @@ jobs:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: |
           python scripts/run_simulation.py \
-            "${{ inputs.use_case_id }}" \
+            "${{ inputs.cohort_id }}" \
             "${{ inputs.question }}" \
             ${{ inputs.samples_per_persona }} \
             ${{ inputs.temperature }}
@@ -77,5 +77,5 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add outputs/
-          git diff --staged --quiet || git commit -m "Census [${{ inputs.use_case_id }}]: ${{ inputs.question }}"
+          git diff --staged --quiet || git commit -m "Census [${{ inputs.cohort_id }}]: ${{ inputs.question }}"
           git push

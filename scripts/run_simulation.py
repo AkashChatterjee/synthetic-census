@@ -39,7 +39,7 @@ def query_persona(
 
 def aggregate_responses(
     client: anthropic.Anthropic,
-    use_case_id: str,
+    cohort_id: str,
     question: str,
     all_responses: dict,
     model: str = "claude-sonnet-4-5-20250929"
@@ -58,7 +58,7 @@ def aggregate_responses(
     aggregation_prompt = f"""You are a senior research analyst synthesizing results from a demographically diverse panel study.
 
 STUDY CONFIGURATION
-- Use Case: {use_case_id.replace("_", " ").title()}
+- Cohort: {cohort_id.replace("_", " ").title()}
 - Personas Surveyed: {len(all_responses)}
 - Samples Per Persona: {len(next(iter(all_responses.values()))["samples"])}
 - Total Independent Responses: {total_samples}
@@ -136,7 +136,7 @@ Write a 500-word article summarizing public sentiment on this issue, written as 
 
 
 def run_simulation(
-    use_case_id: str,
+    cohort_id: str,
     question: str,
     samples_per_persona: int = 3,
     temperature: float = 0.7
@@ -152,8 +152,8 @@ def run_simulation(
     run_id = f"run_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
 
     # Set up paths
-    personas_dir = Path("personas") / use_case_id
-    outputs_dir = Path("outputs") / use_case_id / run_id
+    personas_dir = Path("personas") / cohort_id
+    outputs_dir = Path("outputs") / cohort_id / run_id
     outputs_dir.mkdir(parents=True, exist_ok=True)
 
     # Validate personas directory
@@ -177,7 +177,7 @@ def run_simulation(
     print(f"\n{'='*70}")
     print(f"SYNTHETIC CENSUS SIMULATION")
     print(f"{'='*70}")
-    print(f"Use Case ID     : {use_case_id}")
+    print(f"Cohort ID       : {cohort_id}")
     print(f"Run ID          : {run_id}")
     print(f"Question        : {question}")
     print(f"Personas        : {len(persona_files)}")
@@ -188,7 +188,7 @@ def run_simulation(
 
     # Save config
     config = {
-        "use_case_id": use_case_id,
+        "cohort_id": cohort_id,
         "run_id": run_id,
         "question": question,
         "samples_per_persona": samples_per_persona,
@@ -254,7 +254,7 @@ def run_simulation(
     try:
         analysis = aggregate_responses(
             client=client,
-            use_case_id=use_case_id,
+            cohort_id=cohort_id,
             question=question,
             all_responses=all_responses
         )
@@ -270,7 +270,7 @@ def run_simulation(
 
 | Field | Value |
 |-------|-------|
-| **Use Case** | `{use_case_id}` |
+| **Cohort** | `{cohort_id}` |
 | **Run ID** | `{run_id}` |
 | **Timestamp** | {datetime.now().strftime("%Y-%m-%d %H:%M UTC")} |
 | **Personas** | {len(persona_files)} |
@@ -334,7 +334,7 @@ Each persona was queried independently via isolated API calls. Responses are pre
     print(f"\n{'='*70}")
     print("SIMULATION COMPLETE")
     print(f"{'='*70}")
-    print(f"Use Case        : {use_case_id}")
+    print(f"Cohort          : {cohort_id}")
     print(f"Run ID          : {run_id}")
     print(f"Report          : {report_file}")
     print(f"Latest          : {latest_file}")
@@ -350,34 +350,34 @@ def main():
 Synthetic Census - Demographic Perspective Simulator
 
 Usage:
-    python run_simulation.py <use_case_id> "<question>" [samples_per_persona] [temperature]
+    python run_simulation.py <cohort_id> "<question>" [samples_per_persona] [temperature]
 
 Arguments:
-    use_case_id         Folder name under personas/ containing .md files
+    cohort_id           Folder name under personas/ containing .md files
     question            The question to ask all personas (quote if contains spaces)
     samples_per_persona Number of independent samples per persona (default: 3)
     temperature         Sampling temperature 0.0-1.0 (default: 0.7)
 
 Examples:
-    python run_simulation.py ai_job_impact "How worried are you about AI taking your job?" 3 0.7
+    python run_simulation.py tier_1_city "What are your thoughts on urban infrastructure?" 3 0.7
     python run_simulation.py ev_adoption "Would you buy an electric vehicle?" 5 0.8
 
 Output:
-    outputs/{use_case_id}/run_{timestamp}/
+    outputs/{cohort_id}/run_{timestamp}/
         ├── config.json       # Run configuration
         ├── responses.json    # All raw responses
         └── report.md         # Full analysis report
-    outputs/{use_case_id}/latest.md  # Pointer to most recent run
+    outputs/{cohort_id}/latest.md  # Pointer to most recent run
 """)
         sys.exit(1)
 
-    use_case_id = sys.argv[1]
+    cohort_id = sys.argv[1]
     question = sys.argv[2]
     samples_per_persona = int(sys.argv[3]) if len(sys.argv) > 3 else 3
     temperature = float(sys.argv[4]) if len(sys.argv) > 4 else 0.7
 
     run_simulation(
-        use_case_id=use_case_id,
+        cohort_id=cohort_id,
         question=question,
         samples_per_persona=samples_per_persona,
         temperature=temperature
