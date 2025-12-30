@@ -1,0 +1,17 @@
+{
+  "use_case_id": "ai_job_impact",
+  "run_id": "run_20251230_043622",
+  "question": "What is your opinion on universal minimum income for country like India",
+  "samples_per_persona": 3,
+  "temperature": 0.7,
+  "personas": [
+    "high_school_teacher",
+    "radiologist",
+    "retail_manager",
+    "software_engineer",
+    "truck_driver"
+  ],
+  "total_api_calls": 16,
+  "timestamp": "2025-12-30T04:36:22.719785",
+  "model": "claude-sonnet-4-5-20250929"
+}
