@@ -21,6 +21,10 @@ on:
         required: false
         default: '0.7'
         type: string
+      aggregation_prompt:
+        description: 'Optional custom prompt to guide how persona responses should be aggregated'
+        required: false
+        type: string
 
 jobs:
   simulate:
@@ -66,11 +70,20 @@ jobs:
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: |
-          python scripts/run_simulation.py \
-            "${{ inputs.cohort_id }}" \
-            "${{ inputs.question }}" \
-            ${{ inputs.samples_per_persona }} \
-            ${{ inputs.temperature }}
+          if [ -n "${{ inputs.aggregation_prompt }}" ]; then
+            python scripts/run_simulation.py \
+              "${{ inputs.cohort_id }}" \
+              "${{ inputs.question }}" \
+              ${{ inputs.samples_per_persona }} \
+              ${{ inputs.temperature }} \
+              "${{ inputs.aggregation_prompt }}"
+          else
+            python scripts/run_simulation.py \
+              "${{ inputs.cohort_id }}" \
+              "${{ inputs.question }}" \
+              ${{ inputs.samples_per_persona }} \
+              ${{ inputs.temperature }}
+          fi
 
       - name: Commit results
         run: |

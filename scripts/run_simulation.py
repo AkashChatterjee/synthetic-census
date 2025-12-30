@@ -42,10 +42,20 @@ def aggregate_responses(
     cohort_id: str,
     question: str,
     all_responses: dict,
-    model: str = "claude-sonnet-4-5-20250929"
+    model: str = "claude-sonnet-4-5-20250929",
+    custom_aggregation_prompt: Optional[str] = None
 ) -> str:
     """
     Make a single API call to aggregate and analyze all responses.
+
+    Args:
+        client: Anthropic API client
+        cohort_id: Identifier for the cohort
+        question: The question asked to personas
+        all_responses: Dictionary of all persona responses
+        model: Model to use for aggregation
+        custom_aggregation_prompt: Optional custom prompt to guide aggregation.
+                                   If None, uses the default comprehensive analysis format.
     """
 
     # Build clean response summary for analysis
@@ -55,7 +65,32 @@ def aggregate_responses(
 
     total_samples = sum(len(data["samples"]) for data in all_responses.values())
 
-    aggregation_prompt = f"""You are a senior research analyst synthesizing results from a demographically diverse panel study.
+    # Use custom prompt if provided, otherwise use default
+    if custom_aggregation_prompt:
+        # Include context in custom prompt
+        aggregation_prompt = f"""You are a senior research analyst synthesizing results from a demographically diverse panel study.
+
+STUDY CONFIGURATION
+- Cohort: {cohort_id.replace("_", " ").title()}
+- Personas Surveyed: {len(all_responses)}
+- Samples Per Persona: {len(next(iter(all_responses.values()))["samples"])}
+- Total Independent Responses: {total_samples}
+- Methodology: Each response was generated via isolated API call (no cross-contamination)
+
+QUESTION ASKED
+{question}
+
+RESPONSES BY PERSONA
+Each persona was queried multiple times independently. Variance across samples indicates ambivalence; consistency indicates conviction.
+
+{json.dumps(responses_for_analysis, indent=2)}
+
+---
+
+{custom_aggregation_prompt}
+"""
+    else:
+        aggregation_prompt = f"""You are a senior research analyst synthesizing results from a demographically diverse panel study.
 
 STUDY CONFIGURATION
 - Cohort: {cohort_id.replace("_", " ").title()}
@@ -139,10 +174,19 @@ def run_simulation(
     cohort_id: str,
     question: str,
     samples_per_persona: int = 3,
-    temperature: float = 0.7
+    temperature: float = 0.7,
+    aggregation_prompt: Optional[str] = None
 ) -> None:
     """
     Run full simulation with isolated API calls per persona sample.
+
+    Args:
+        cohort_id: Identifier for the cohort (folder name under personas/)
+        question: The question to ask all personas
+        samples_per_persona: Number of independent samples per persona
+        temperature: Sampling temperature (0.0-1.0)
+        aggregation_prompt: Optional custom prompt to guide aggregation.
+                           If None, uses default comprehensive analysis format.
     """
 
     # Initialize client
@@ -193,6 +237,7 @@ def run_simulation(
         "question": question,
         "samples_per_persona": samples_per_persona,
         "temperature": temperature,
+        "aggregation_prompt": aggregation_prompt,
         "personas": [f.stem for f in persona_files],
         "total_api_calls": total_api_calls,
         "timestamp": datetime.now().isoformat(),
@@ -256,7 +301,8 @@ def run_simulation(
             client=client,
             cohort_id=cohort_id,
             question=question,
-            all_responses=all_responses
+            all_responses=all_responses,
+            custom_aggregation_prompt=aggregation_prompt
         )
         print("✓")
     except Exception as e:
@@ -350,17 +396,20 @@ def main():
 Synthetic Census - Demographic Perspective Simulator
 
 Usage:
-    python run_simulation.py <cohort_id> "<question>" [samples_per_persona] [temperature]
+    python run_simulation.py <cohort_id> "<question>" [samples_per_persona] [temperature] [aggregation_prompt]
 
 Arguments:
     cohort_id           Folder name under personas/ containing .md files
     question            The question to ask all personas (quote if contains spaces)
     samples_per_persona Number of independent samples per persona (default: 3)
     temperature         Sampling temperature 0.0-1.0 (default: 0.7)
+    aggregation_prompt  Optional custom prompt to guide aggregation (quote if contains spaces)
+                        If not provided, uses default comprehensive analysis format
 
 Examples:
     python run_simulation.py tier_1_city "What are your thoughts on urban infrastructure?" 3 0.7
     python run_simulation.py ev_adoption "Would you buy an electric vehicle?" 5 0.8
+    python run_simulation.py tier_1_city "What messaging would resonate?" 3 0.7 "Summarize as bullet points"
 
 Output:
     outputs/{cohort_id}/run_{timestamp}/
@@ -375,12 +424,14 @@ Output:
     question = sys.argv[2]
     samples_per_persona = int(sys.argv[3]) if len(sys.argv) > 3 else 3
     temperature = float(sys.argv[4]) if len(sys.argv) > 4 else 0.7
+    aggregation_prompt = sys.argv[5] if len(sys.argv) > 5 else None
 
     run_simulation(
         cohort_id=cohort_id,
         question=question,
         samples_per_persona=samples_per_persona,
-        temperature=temperature
+        temperature=temperature,
+        aggregation_prompt=aggregation_prompt
     )
 
 
