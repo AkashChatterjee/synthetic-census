@@ -1,0 +1,22 @@
+{
+  "cohort_id": "tech_curious_twitter",
+  "run_id": "run_20260217_171751",
+  "question": "What non-trivial long-form article you'll definitely read on X?",
+  "samples_per_persona": 3,
+  "temperature": 0.7,
+  "aggregation_prompt": "What are the top 3 topics that will provide most value?",
+  "personas": [
+    "ai_policy_researcher",
+    "corporate_strategy_vp",
+    "equity_research_analyst",
+    "high_school_teacher",
+    "management_consultant",
+    "science_fiction_author",
+    "tech_ip_lawyer",
+    "tech_newsletter_writer",
+    "vc_partner"
+  ],
+  "total_api_calls": 28,
+  "timestamp": "2026-02-17T17:17:51.267118",
+  "model": "claude-sonnet-4-5-20250929"
+}
